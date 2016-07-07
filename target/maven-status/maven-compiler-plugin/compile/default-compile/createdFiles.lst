@@ -2,6 +2,7 @@ com\yawei\exception\NotFindException.class
 com\yawei\service\BookService.class
 com\yawei\util\Page.class
 com\yawei\pojo\BookType.class
+com\yawei\controller\DataTableController.class
 com\yawei\pojo\Publisher.class
 com\yawei\mapper\BookMapper.class
 com\yawei\pojo\User.class

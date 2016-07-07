@@ -25,7 +25,7 @@
 
     <select id="findAll" resultType="Book">
         SELECT t_book.*,
-        t_booktype.id as 'bookType.id',t_booktype.booktype as 'booktype.booktype',
+        t_booktype.id as 'bookType.id',t_booktype.booktype as 'bookType.booktype',
         t_publisher.id as 'publisher.id',t_publisher.pubname as 'publisher.pubname'
         FROM t_book
         INNER JOIN t_booktype ON t_book.typeid = t_booktype.id
@@ -51,7 +51,7 @@
     </select>
     <select id="findByPage" resultType="Book">
         SELECT t_book.*,
-        t_booktype.id as 'bookType.id',t_booktype.booktype as 'booktype.booktype',
+        t_booktype.id as 'bookType.id',t_booktype.booktype as 'bookTtype.booktype',
         t_publisher.id as 'publisher.id',t_publisher.pubname as 'publisher.pubname'
         FROM t_book
         INNER JOIN t_booktype ON t_book.typeid = t_booktype.id
@@ -61,7 +61,7 @@
     </select>
     <select id="findByParam" resultType="Book">
         SELECT t_book.*,
-        t_booktype.id as 'bookType.id',t_booktype.booktype as 'booktype.booktype',
+        t_booktype.id as 'bookType.id',t_booktype.booktype as 'bookType.booktype',
         t_publisher.id as 'publisher.id',t_publisher.pubname as 'publisher.pubname'
         FROM t_book
         INNER JOIN t_booktype ON t_book.typeid = t_booktype.id
@@ -79,6 +79,39 @@
         </where>
         ORDER BY t_book.id DESC
         limit ${start},${size}
+    </select>
+
+    <select id="countByKeyWord" resultType="long">
+        SELECT COUNT(*) FROM t_book
+        <where>
+            <if test="keyword!=null and keyword!=''">
+                bookname like concat('%',#{keyword},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="findByDataTable" resultType="Book">
+        SELECT t_book.*,
+        t_booktype.id as 'bookType.id',t_booktype.booktype as 'bookType.booktype',
+        t_publisher.id as 'publisher.id',t_publisher.pubname as 'publisher.pubname'
+        FROM t_book
+        INNER JOIN t_booktype ON t_book.typeid = t_booktype.id
+        INNER JOIN t_publisher ON t_book.pubid = t_publisher.id
+        <where>
+            <if test="bookname !=null and bookname !=''">
+                bookname like concat('%',#{bookname},'%')
+            </if>
+            <if test="type !=null and type !=''">
+                and typeid = #{type}
+            </if>
+            <if test="pub !=null and pub !=''">
+                and pubid = #{pub}
+            </if>
+        </where>
+        <if test="sortColumnName != null and sortColumnName != '' and sortType != null and sortType != ''">
+            ORDER BY ${sortColumnName} ${sortType}
+        </if>
+        limit ${start},${length}
     </select>
 
 </mapper>

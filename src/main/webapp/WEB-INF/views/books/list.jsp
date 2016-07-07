@@ -38,7 +38,6 @@
             </div>
             <button class="btn btn-default">搜索</button>
         </form>
-
     </div>
     <a href="/books/new" class="btn btn-success">添加新书籍</a>
 
@@ -90,7 +89,7 @@
             prev: '上一页',
             next: '下一页',
             last: '末页',
-            href: '?p={{number}}'
+            href: '?bookname='+encodeURIComponent('${bookname}')+'&type=${typeid}&pub=${pubid}&p={{number}}'
         });
     });
     $(".delLink").click(function () {

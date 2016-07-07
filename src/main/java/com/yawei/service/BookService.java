@@ -60,4 +60,16 @@ public class BookService {
         page.setItems(bookList);
         return page;
     }
+
+    public List<Book> findDataTables(Map<String, Object> param) {
+        return bookMapper.findByDataTable(param);
+    }
+
+    public Long count() {
+        return bookMapper.count();
+    }
+
+    public Long countByKeyWord(String keyword) {
+        return bookMapper.countByKeyWord(keyword);
+    }
 }
