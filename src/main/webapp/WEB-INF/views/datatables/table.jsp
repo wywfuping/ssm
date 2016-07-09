@@ -37,61 +37,7 @@
         </form>
     </div>
 
-    <%--新增弹出框--%>
-    <div class="modal fade" id="newBookModel">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">新增书籍</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="col-xs-4">
-                        <form id="saveForm">
-                            <div class="form-group">
-                                <label>书籍名称</label>
-                                <input type="text" class="form-control" name="bookname">
-                            </div>
-                            <div class="form-group">
-                                <label>作者</label>
-                                <input type="text" class="form-control" name="bookauthor">
-                            </div>
-                            <div class="form-group">
-                                <label>出版社</label>
-                                <select type="text" class="form-control" name="pubid">
-                                    <c:forEach var="pub" items="${pubs}">
-                                        <option value="${pub.id}">${pub.pubname}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>价格</label>
-                                <input type="text" class="form-control" name="bookprice">
-                            </div>
-                            <div class="form-group">
-                                <label>数量</label>
-                                <input type="text" class="form-control" name="booknum">
-                            </div>
-                            <div class="form-group">
-                                <label>分类</label>
-                                <select type="text" class="form-control" name="typeid">
-                                    <c:forEach var="type" items="${types}">
-                                        <option value="${type.id}">${type.booktype}</option>
-                                    </c:forEach>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary" id="savaBtn">保存</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <a href="/datatabless/new" class="btn btn-success" style="margin-bottom: 20px">添加新书籍</a>
+    <a href="/datatabless/new" class="btn btn-success" id="newBookBtn" style="margin-bottom: 20px">添加新书籍</a>
 
     <table id="datatable" class="table">
         <thead>
@@ -112,6 +58,57 @@
     </table>
 </div>
 
+<%--新增弹出框--%>
+<div class="modal fade" id="newBookModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">添加新书籍</h4>
+            </div>
+            <div class="modal-body">
+                <form id="saveForm">
+                    <div class="form-group">
+                        <label>书籍名称</label>
+                        <input type="text" name="bookname" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>书籍作者</label>
+                        <input type="text" name="bookauthor" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>书籍价格</label>
+                        <input type="text" name="bookprice" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>书籍数量</label>
+                        <input type="text" name="booknum" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select class="form-control" name="typeid">
+                            <c:forEach items="${types}" var="type">
+                                <option value="${type.id}">${type.booktype}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>出版社</label>
+                        <select class="form-control" name="pubid">
+                            <c:forEach items="${pubs}" var="pub">
+                                <option value="${pub.id}">${pub.pubname}</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveBtn">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/static/js/jquery-2.2.3.min.js"></script>
 <script src="/static/css/bootstrap.min.css"></script>
 <script src="/static/js/datatables/js/jquery.dataTables.min.js"></script>
@@ -119,7 +116,7 @@
 <script src="/static/js/jquery.validate.min.js"></script>
 <script>
     $(function () {
-        $("#datatable").DataTable({
+        var dataTable = $("#datatable").DataTable({
             "serverSide": true,
             "order": [0, 'desc'],
             "searching": false,
@@ -180,8 +177,8 @@
                     required: true,
                     digits: true
                 },
-                messages: {{
-                    bookname:
+                messages: {
+                    bookname: {
                         required: "请输入书籍名称"
                     },
                     bookauthor: {
@@ -196,7 +193,33 @@
                         digits: "请输入正确的数量"
                     }
                 }
+            },
+            submitHandler: function (form) {
+                $.post("/datatables/new", $(form).serialize())
+                        .done(function (data) {
+                            if (data == "success") {
+                                $("#newBookModel").modal("hide");
+                                dataTable.ajax.reload();
+                            }
+                        })
+                        .fail(function () {
+                            alert("请求出现异常！");
+                        });
             }
+
+        });
+
+        $("#newBookBtn").click(function () {
+            $("#saveForm")[0].reset();
+            $("#newBookModel").modal({
+                show:true,
+                backdrop:'static',
+                keyboard:false
+            });
+        });
+
+        $("#savaBtn").click(function () {
+            $("#saveForm").submit();
         });
     });
 </script>
